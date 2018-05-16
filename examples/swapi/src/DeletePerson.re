@@ -20,7 +20,7 @@ let make = _children => {
     /* pick a valid id from list returned from GetPersons query here
        "https://api.graph.cool/simple/v1/cjdgba1jw4ggk0185ig4bhpsn" and pass it to ~id variable
        */
-    let deletePersonMutation = DeletePerson.make(~id="cjgattirazy8v0107nh3hu8dz", ());
+    let deletePersonMutation = DeletePerson.make(~id="cjh94corlzfxw0118i9fchgan", ());
     <DeletePersonMutation>
       ...(
            (mutation, _) =>

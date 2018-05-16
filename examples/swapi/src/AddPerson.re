@@ -17,7 +17,7 @@ module AddPersonMutation = ReasonApollo.CreateMutation(AddPerson);
 let make = _children => {
   ...component,
   render: _self => {
-    let addPersonMutation = AddPerson.make(~name="Mark", ~age=24, ());
+    let addPersonMutation = AddPerson.make(~name="Steve", ~age=42, ());
     <AddPersonMutation>
       ...(
            (mutation, {result}) => {
