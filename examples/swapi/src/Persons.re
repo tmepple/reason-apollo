@@ -21,27 +21,25 @@ let make = _children => {
   render: _self =>
     <GetAllPersonsQuery>
       ...(
-        ({result}) =>
-          <div>
-            <h1> ("Persons: " |> ste) </h1>
-            (
-              switch (result) {
-              | NoData => "No Data" |> ste
+           ({result}) =>
+             <div>
+               <h1> ("Persons: " |> ste) </h1>
+               (
+                 switch (result) {
+                 | NoData => "No Data" |> ste
                  | Error(e) =>
-                Js.log(e);
+                   Js.log(e);
                    "Something Went Wrong" |> ste;
-              | Loading => "Loading" |> ste
-              | Data(response) =>
-                  response##allPersons
+                 | Loading => "Loading" |> ste
+                 | Data(response) =>
+                   response##allPersons
                    |> Array.mapi((index, person) =>
-                        <div key=(index |> string_of_int)>
-                          (person##name |> ste)
-                        </div>
+                        <div key=(index |> string_of_int)> (person##name |> ste) </div>
                       )
                    |> ReasonReact.array
-              }
-            )
-          </div>
-      )
+                 }
+               )
+             </div>
+         )
     </GetAllPersonsQuery>,
 };
