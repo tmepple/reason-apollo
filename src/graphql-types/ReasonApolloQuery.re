@@ -2,14 +2,13 @@ open ReasonApolloTypes;
 
 module Get = (Config:ReasonApolloTypes.Config) => {    
     [@bs.module] external gql : ReasonApolloTypes.gql = "graphql-tag";
-    [@bs.module "react-apollo"] external queryComponent : ReasonReact.reactClass = "Query";
-    
+  [@bs.module "react-apollo"]
+  external queryComponent : ReasonReact.reactClass = "Query";
     type response =
       | Loading
       | Error(apolloError)
       | Data(Config.t)
       | NoData;
-
     type renderPropObj = {
       result: response,
       data: option(Config.t),
@@ -19,10 +18,9 @@ module Get = (Config:ReasonApolloTypes.Config) => {
       fetchMore: (~variables: Js.Json.t) => Js.Promise.t(unit),
       networkStatus: int,
     };
-
     type renderPropObjJS = {
       .
-      "loading": Js.boolean,
+    "loading": bool,
       "data": Js.Nullable.t(Js.Json.t),
       "error": Js.Nullable.t(apolloError),
       "refetch":
@@ -33,25 +31,23 @@ module Get = (Config:ReasonApolloTypes.Config) => {
       "variables": Js.Null_undefined.t(Js.Json.t),
       "fetchMore": [@bs.meth] (apolloOptions => Js.Promise.t(unit)),
     };
-
-    let graphqlQueryAST = [@bs] gql(Config.query);
-
+  let graphqlQueryAST = gql(. Config.query);
     let apolloDataToVariant: renderPropObjJS => response =
     apolloData =>
       switch (
-        apolloData##loading |> Js.to_bool,
-        apolloData##data |> Js.Nullable.to_opt,
-        apolloData##error |> Js.Nullable.to_opt,
+        apolloData##loading,
+        apolloData##data |> Js.Nullable.toOption,
+        apolloData##error |> Js.Nullable.toOption,
       ) {
       | (true, _, _) => Loading
       | (false, Some(response), _) => Data(Config.parse(response))
       | (false, _, Some(error)) => Error(error)
       | (false, None, None) => NoData
       };
-    
     let convertJsInputToReason = (apolloData: renderPropObjJS) => {
       result: apolloData |> apolloDataToVariant,
-      data: switch (apolloData##data |> ReasonApolloUtils.getNonEmptyObj) {
+    data:
+      switch (apolloData##data |> ReasonApolloUtils.getNonEmptyObj) {
       | None => None
       | Some(data) => 
         switch (Config.parse(data)) {
@@ -59,20 +55,26 @@ module Get = (Config:ReasonApolloTypes.Config) => {
         | exception _ => None
         }
       },
-      error: switch (apolloData##error |> Js.Nullable.to_opt) {
+    error:
+      switch (apolloData##error |> Js.Nullable.toOption) {
       | Some(error) => Some(error)
       | None => None
       },
-      loading: apolloData##loading |> Js.to_bool,
+    loading: apolloData##loading,
       refetch: variables =>
-        apolloData##refetch(variables |> Js.Nullable.from_opt)
-        |> Js.Promise.then_(data => data |> apolloDataToVariant |> Js.Promise.resolve),
+      apolloData##refetch(variables |> Js.Nullable.fromOption)
+      |> Js.Promise.then_(data =>
+           data |> apolloDataToVariant |> Js.Promise.resolve
+         ),
       fetchMore: (~variables) =>
-        apolloData##fetchMore({"variables": variables, "query": graphqlQueryAST}),
-      networkStatus: apolloData##networkStatus
+      apolloData##fetchMore({
+        "variables": variables,
+        "query": graphqlQueryAST,
+      }),
+    networkStatus: apolloData##networkStatus,
     };
-
-    let make = (
+  let make =
+      (
       ~variables: option(Js.Json.t)=?,
       ~pollInterval: option(int)=?,
       ~notifyOnNetworkStatusChange: option(bool)=?,
@@ -82,27 +84,29 @@ module Get = (Config:ReasonApolloTypes.Config) => {
       ~displayName: option(string)=?,
       ~delay: option(bool)=?,
       ~context: option(Js.Json.t)=?,
-      children: renderPropObj => ReasonReact.reactElement
-    ) => ReasonReact.wrapJsForReason(
+        children: renderPropObj => ReasonReact.reactElement,
+      ) =>
+    ReasonReact.wrapJsForReason(
       ~reactClass=queryComponent,
-      ~props=Js.Nullable.(
+      ~props=
+        Js.Nullable.(
         {
           "query": graphqlQueryAST,
-          "variables": variables |> from_opt,
-          "pollInterval": pollInterval |> from_opt,
-          "notifyOnNetworkStatusChange": notifyOnNetworkStatusChange 
-            |> Js.Option.map([@bs] (b) => Js.Boolean.to_js_boolean(b)) 
-            |> from_opt,
-          "fetchPolicy": fetchPolicy |> from_opt,
-          "errorPolicy": errorPolicy |> from_opt,
-          "ssr": ssr
-            |> Js.Option.map([@bs] (b) => Js.Boolean.to_js_boolean(b)) 
-            |> from_opt,
-          "displayName": displayName |> from_opt,
-          "delay": delay |> from_opt,
-          "context": context |> from_opt
+            "variables": variables |> fromOption,
+            "pollInterval": pollInterval |> fromOption,
+            "notifyOnNetworkStatusChange":
+              notifyOnNetworkStatusChange
+              |> Js.Option.map((. b) => b)
+              |> fromOption,
+            "fetchPolicy": fetchPolicy |> fromOption,
+            "errorPolicy": errorPolicy |> fromOption,
+            "ssr": ssr |> Js.Option.map((. b) => b) |> fromOption,
+            "displayName": displayName |> fromOption,
+            "delay": delay |> fromOption,
+            "context": context |> fromOption,
         }
       ),
-      apolloData => apolloData |> convertJsInputToReason |> children
+      apolloData =>
+      apolloData |> convertJsInputToReason |> children
     );
   };

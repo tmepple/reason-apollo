@@ -1,5 +1,5 @@
 let getNonEmptyObj = jsObj => 
-switch (jsObj |> Js.Nullable.to_opt) {
+  switch (jsObj |> Js.Nullable.toOption) {
     | None => None
     | Some(data) => 
       switch (Js.Json.decodeObject(data)) {
@@ -9,5 +9,5 @@ switch (jsObj |> Js.Nullable.to_opt) {
         | 0 => None
         | _ => Some(Js.Json.object_(data))
         }
-      };
+    }
     };
