@@ -22,8 +22,7 @@ type inMemoryCacheRestoreData = Js.Nullable.t(restoreData);
 external apolloInMemoryCache : 'a => apolloCache = "InMemoryCache";
 
 /* Bind the restore method */
-[@bs.send.pipe : 't]
-external restore : inMemoryCacheRestoreData => apolloCache = "restore";
+[@bs.send.pipe: 't] external restore : inMemoryCacheRestoreData => apolloCache = "restore";
 
 /* Fragment matcher */
 type fragmentMatcher;
@@ -36,16 +35,13 @@ let createIntrospectionFragmentMatcher = (~data) =>
   introspectionFragmentMatcher({"introspectionQueryResultData": data});
 
 /* Instantiate a new cache object */
-[@bs.obj] external
-makeApolloInMemoryCacheParams : 
-(
-  ~dataIdFromObject: (Js.t({..}) => string)=?, 
-  ~fragmentMatcher: fragmentMatcher=?
-) => _ = "";
+[@bs.obj]
+external makeApolloInMemoryCacheParams :
+  (~dataIdFromObject: Js.t({..}) => string=?, ~fragmentMatcher: fragmentMatcher=?) => _ =
+  "";
 
-let createInMemoryCache = (~dataIdFromObject=?, ~fragmentMatcher=?, ()) => {
-    /* Apollo Client, looks for key in Object. Doesn't check if value is null  */
+let createInMemoryCache = (~dataIdFromObject=?, ~fragmentMatcher=?, ()) =>
+  /* Apollo Client, looks for key in Object. Doesn't check if value is null  */
   apolloInMemoryCache(
-     makeApolloInMemoryCacheParams(~dataIdFromObject?, ~fragmentMatcher?)
-   );
-};
+    makeApolloInMemoryCacheParams(~dataIdFromObject?, ~fragmentMatcher?),
+  );
