@@ -3,15 +3,13 @@
   "version": "0.1.0",
   "scripts": {
     "build": "bsb -make-world",
-    "start": "bsb -make-world -w",
+    "start": "bsb -clean-world -make-world -w",
     "clean": "bsb -clean-world",
     "webpack": "webpack-dev-server",
     "format": "refmt",
     "get-schema": "yarn send-introspection-query http://swapi.apis.guru/"
   },
-  "keywords": [
-    "BuckleScript"
-  ],
+  "keywords": ["BuckleScript"],
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -26,7 +24,8 @@
     "react": "^16.3.2",
     "react-apollo": "^2.1.3",
     "react-dom": "^16.3.2",
-    "reason-apollo": "../../",
+    "//": "following line was reason-apollo ../.. to point to the in-repo package",
+    "reason-apollo": "emmenko/reason-apollo#pending-patches",
     "reason-react": "^0.4.1"
   },
   "devDependencies": {
